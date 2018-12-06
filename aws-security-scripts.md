@@ -138,9 +138,10 @@ Perform the following to determine if access keys are rotated as prescribed:
 7. Ensure all active keys have been rotated within 90 days 
 
 Via CLI
-
-`aws iam generate-credential-report`
-`aws iam get-credential-report --query 'Content' --output text | base64 -d`
+```
+aws iam generate-credential-report
+aws iam get-credential-report --query 'Content' --output text | base64 -d
+```
 ### Remediation:
 Perform the following to rotate access keys:
 1. Login to the AWS Management Console:
