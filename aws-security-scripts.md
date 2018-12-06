@@ -140,7 +140,6 @@ Perform the following to determine if access keys are rotated as prescribed:
 Via CLI
 
 `aws iam generate-credential-report`
-
 `aws iam get-credential-report --query 'Content' --output text | base64 -d`
 ### Remediation:
 Perform the following to rotate access keys:
