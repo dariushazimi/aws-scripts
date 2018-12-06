@@ -161,3 +161,16 @@ Via CLI
     aws iam create-access-key
     aws iam delete-access-key
     ```
+## 1.5 Ensure IAM password policy requires at least one uppercase letter
+Via CLI
+`aws iam get-account-password-policy`
+Ensure the output of the above command includes "RequireUppercaseCharacters": true
+Via CLI
+`aws iam update-account-password-policy --require-uppercase-characters`
+## 1.6 Ensure IAM password policy requires at least one lowercase letter
+Via CLI
+`aws iam get-account-password-policy`
+Ensure the output of the above command includes "RequireUppercaseCharacters": true
+Via CLI
+`aws iam update-account-password-policy --require-lowercase-characters`
+
