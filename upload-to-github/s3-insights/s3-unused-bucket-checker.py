@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 
 """
 Script Name: s3-unused-bucket-checker.py
-Author: Dariush Azimi
-Date: June 2024
+Author: Dariush Azimi 
+Date: 2024-06-27
 
 Description:
     This script identifies unused S3 buckets based on the last modified date of their contents.
@@ -12,6 +13,7 @@ Description:
 
 import boto3
 import sys
+import argparse
 from datetime import datetime, timedelta, timezone
 
 def list_unused_buckets(days):
@@ -43,10 +45,19 @@ def list_unused_buckets(days):
             print(f"Bucket '{bucket_name}' is empty or has no objects since creation.")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python check_s3_buckets.py <number_of_days>")
-        sys.exit(1)
+    # Initialize the argument parser
+    parser = argparse.ArgumentParser(description="Identify unused S3 buckets based on the last modified date of their contents.")
     
-    days = int(sys.argv[1])
-    list_unused_buckets(days)
+    # Add the 'days' argument
+    parser.add_argument(
+        'days', 
+        type=int, 
+        help="Number of days to check for unused S3 buckets."
+    )
+    
+    # Parse the arguments
+    args = parser.parse_args()
+    
+    # Call the function with the provided number of days
+    list_unused_buckets(args.days)
 
