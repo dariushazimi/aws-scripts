@@ -40,4 +40,5 @@ For example, to check for buckets that haven't been used in the last 90 days:
 ```
 python s3-unused-bucket-checker.py 90
 ```
-
+## Example Output
+![Example Output](s3-checker-in-action.jpg)
