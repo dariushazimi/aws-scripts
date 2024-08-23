@@ -2,7 +2,7 @@
 
 """
 Script Name: s3-unused-bucket-checker.py
-Author: Dariush Azimi 
+Author: Dariush Azimi
 Date: 2024-06-27
 
 Description:
@@ -16,6 +16,27 @@ import sys
 import argparse
 from datetime import datetime, timedelta, timezone
 from prettytable import PrettyTable
+from concurrent.futures import ThreadPoolExecutor
+
+def check_bucket_status(s3_client, account_id, bucket, cutoff_date):
+    bucket_name = bucket['Name']
+    
+    # Get the most recent object in the bucket
+    objects = s3_client.list_objects_v2(Bucket=bucket_name)
+    
+    if 'Contents' in objects:
+        recent_object = max(objects['Contents'], key=lambda x: x['LastModified'])
+        recent_date = recent_object['LastModified']
+        
+        # Check if the recent date is older than the cutoff date
+        if recent_date < cutoff_date:
+            status = f"Not used since {recent_date.strftime('%Y-%m-%d')}"
+        else:
+            status = "Recently used"
+    else:
+        status = "Empty"
+    
+    return [account_id, bucket_name, status]
 
 def list_unused_buckets(days):
     # Calculate the cutoff date
@@ -41,27 +62,13 @@ def list_unused_buckets(days):
     table.align["Bucket Name"] = "l"
     table.align["Status"] = "l"
     
-    # Loop through each bucket
-    for bucket in buckets:
-        bucket_name = bucket['Name']
+    # Use threading to check buckets in parallel
+    with ThreadPoolExecutor() as executor:
+        results = executor.map(lambda bucket: check_bucket_status(s3_client, account_id, bucket, cutoff_date), buckets)
         
-        # Get the most recent object in the bucket
-        objects = s3_client.list_objects_v2(Bucket=bucket_name)
-        
-        if 'Contents' in objects:
-            recent_object = max(objects['Contents'], key=lambda x: x['LastModified'])
-            recent_date = recent_object['LastModified']
-            
-            # Check if the recent date is older than the cutoff date
-            if recent_date < cutoff_date:
-                status = f"Not used since {recent_date.strftime('%Y-%m-%d')}"
-            else:
-                status = "Recently used"
-        else:
-            status = "Empty"
-        
-        # Add a row to the table
-        table.add_row([account_id, bucket_name, status])
+        # Add rows to the table
+        for result in results:
+            table.add_row(result)
     
     # Print the table
     print(table)
